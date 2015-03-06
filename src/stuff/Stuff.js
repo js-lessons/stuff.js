@@ -13,6 +13,7 @@ function unwrap(obj) {
     result = JSON.parse(obj);
   } catch (e) {
     console.error(e);
+    result = 1;
   }
 
   return result;
@@ -28,13 +29,27 @@ function setStoredValues(name, storedValues) {
 
 
 function Stuff(name) {
+    this.name = name;
+    if (!(this instanceof Stuff)) {
+        return new Stuff(name);
+    }
+    if (!getStoredValues(name)) {
+        setStoredValues(name, {});
+    } else {
+        if (getStoredValues(name) === 1) {
+            setStoredValues(name, {});
+        }
+    }
 }
 
 Stuff.create = function(name) {
+    return new Stuff(name);
 }
 
-
 Stuff.prototype.add = function(value) {
+    var id = utils.makeId();
+    setStoredValues(this.name, getStoredValues(this.name)[id] = value);
+    return id;
 }
 
 

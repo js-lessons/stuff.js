@@ -3,7 +3,6 @@ var sinon = require('sinon');
 var Stuff = require('../../src/stuff/Stuff');
 var utils = require('../../src/stuff/utils');
 
-
 function wrap(obj) { return JSON.stringify(obj); }
 function unwrap(obj) { return JSON.parse(obj); }
 function getStoredValues(name) { return unwrap(localStorage.getItem(name)); }

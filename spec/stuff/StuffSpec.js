@@ -242,6 +242,7 @@ describe('Stuff', function() {
 
       it('returns filtered values by applying filter function to each element', function() {
         var filteredIds = ghAccounts.filter(moreThanThousand);
+        console.log(filteredIds);
         var filteredValues = filteredIds.map(ghAccounts.get.bind(ghAccounts));
 
         expect(filteredValues).to.deep.equal([
@@ -289,7 +290,7 @@ describe('Stuff', function() {
       it('emits "add" event when new item is added', function() {
         stuff.on('add', spy);
         var id = stuff.add(value);
-
+//        expect(spy.calledOnce).to.be.true;
         expect(spy.calledWith(id, value)).to.be.true;
       });
     });

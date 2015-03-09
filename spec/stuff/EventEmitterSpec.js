@@ -6,7 +6,7 @@ describe('EventEmitter', function() {
   var emitter, cb, ev;
 
   beforeEach(function() {
-    emitter = new EventEmitter;
+    emitter = new EventEmitter();
     cb = sinon.spy();
     ev = 'event';
 

@@ -3,7 +3,6 @@ var sinon = require('sinon');
 var Stuff = require('../../src/stuff/Stuff');
 var utils = require('../../src/stuff/utils');
 
-
 function wrap(obj) { return JSON.stringify(obj); }
 function unwrap(obj) { return JSON.parse(obj); }
 function getStoredValues(name) { return unwrap(localStorage.getItem(name)); }
@@ -243,6 +242,7 @@ describe('Stuff', function() {
 
       it('returns filtered values by applying filter function to each element', function() {
         var filteredIds = ghAccounts.filter(moreThanThousand);
+        console.log(filteredIds);
         var filteredValues = filteredIds.map(ghAccounts.get.bind(ghAccounts));
 
         expect(filteredValues).to.deep.equal([

@@ -13,7 +13,6 @@ function unwrap(obj) {
     result = JSON.parse(obj);
   } catch (e) {
     console.error(e);
-    result = 1;
   }
   return result;
 }
@@ -28,17 +27,15 @@ function setStoredValues(name, storedValues) {
 
 function Stuff(name) {
 
-    this.name = name;
     if (!(this instanceof Stuff)) {
         return new Stuff(name);
     }
+
     if (!getStoredValues(name)) {
         setStoredValues(name, {});
-    } else {
-        if (getStoredValues(name) === 1) {
-            setStoredValues(name, {});
-        }
     }
+
+    this.name = name;
 }
 
 Stuff.create = function(name) {
@@ -50,11 +47,12 @@ Stuff.prototype = new EventEmitter();
 Stuff.prototype.add = function(value) {
 
     var id = utils.makeId();
-    this.emit('add', [id, value]);
     var val = getStoredValues(this.name); val[id] = value;
     setStoredValues(this.name, val);
-    var val = getStoredValues(this.name);
-    this.emit('change', [id, val[id]]);
+
+    this.emit('add', [id, value]);
+    this.emit('change', [id, value]);
+
     return id;
 }
 
@@ -63,11 +61,12 @@ Stuff.prototype.remove = function(id) {
     var val = getStoredValues(this.name);
     if(val.hasOwnProperty(id)){
         var last = val[id];
-        this.emit('remove',[id, last]);
         delete val[id];
         setStoredValues(this.name, val);
-        val = getStoredValues(this.name);
-        this.emit('change',[id, val[id], last])
+
+        this.emit('remove',[id, last]);
+        this.emit('change',[id, undefined, last])
+
         return id;
     }else{
         return false;
@@ -78,20 +77,18 @@ Stuff.prototype.get = function(id) {
     var val = getStoredValues(this.name);
     if(val.hasOwnProperty(id)){
         return val[id];
-    }else{
-        return undefined;
     }
 }
 
 Stuff.prototype.update = function(id, value) {
     var val = getStoredValues(this.name);
     if(val.hasOwnProperty(id)){
-        var last = val[id]
-        this.emit('update',[id, value, last]);
+        var last = val[id];
         val[id] = value;
         setStoredValues(this.name, val);
-        val = getStoredValues(this.name);
-        this.emit('change',[id, val[id], last])
+
+        this.emit('update',[id, value, last]);
+        this.emit('change',[id, value, last])
         return id;
     }else{
         return false;
@@ -102,22 +99,16 @@ Stuff.prototype.clear = function() {
     this.emit('clear');
     var val = getStoredValues(this.name);
     for(var key in val){
-        this.emit('remove',[key, val[key]]);
+        this.remove(key);
     }
-    setStoredValues(this.name, {});
 }
 
 Stuff.prototype.map = function(fn) {
     var val = getStoredValues(this.name);
-    var array = [];
-    if(Object.keys(val).length !== 0){
-        for(var key in val){
-            array.push(fn(key));
-        }
-        return array;
-    }else{
-        return [];
-    }
+
+    return Object.keys(val).reduce(function(prev,item){
+        return prev.concat(fn(item));
+    },[])
 }
 
 Stuff.prototype.reduce = function(fn, initialValue) {
@@ -139,17 +130,14 @@ Stuff.prototype.reduce = function(fn, initialValue) {
 
 Stuff.prototype.filter = function(fn) {
     var val = getStoredValues(this.name);
-    var array = [];
-    if(Object.keys(val).length !== 0){
-        for(var key in val){
-            if(fn(key)){
-                array.push(key);
-            }
+
+    return Object.keys(val).reduce(function(prev,item){
+        if(fn(item)){
+            return prev.concat(item);
+        }else{
+            return prev;
         }
-    }else{
-        return [];
-    }
-    return array;
+    },[])
 }
 
 Stuff.prototype.find = function(fn) {
@@ -171,13 +159,5 @@ Stuff.prototype.forEach = function(fn) {
        fn(key);
    }
 }
-
-
-//ghAccounts = Stuff('githubAccounts');
-//
-//ghAccounts.add({ name: 'kevinsawicki', contribs: 12405, language: 'JavaScript' })
-//extend
-//var destObject = extend(Stuff, EventEmitter);
-//module.exports = destObject;
 
 module.exports = Stuff;

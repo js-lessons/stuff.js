@@ -1,7 +1,8 @@
 function EventEmitter() {
+this.subscriptions = {};
 }
 
-EventEmitter.prototype.subscriptions = {};
+
 
 
 EventEmitter.prototype.on = function(event, fn) {
